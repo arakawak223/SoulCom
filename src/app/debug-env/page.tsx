@@ -1,23 +1,38 @@
+"use client";
+
+import { useState } from "react";
+
 export default function DebugEnvPage() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "(undefined)";
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "(undefined)";
+  const [result, setResult] = useState("Click button to test");
 
-  const hasNewline = key.includes("\n") || key.includes("\r");
-  const hasSpace = key !== key.trim();
-  const hasInvalidChars = /[^\x20-\x7E]/.test(key);
+  const testFetch = async () => {
+    setResult("Testing...");
+    try {
+      const res = await fetch(`${url}/auth/v1/settings`, {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+        },
+      });
+      const text = await res.text();
+      setResult(`Status: ${res.status} - ${text.slice(0, 200)}`);
+    } catch (err: unknown) {
+      setResult(`Error: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  };
 
   return (
     <div style={{ padding: 40, color: "white", fontFamily: "monospace" }}>
       <h1>Environment Variables Check</h1>
-      <p>NEXT_PUBLIC_SUPABASE_URL: <strong>{url}</strong></p>
-      <p>URL length: <strong>{url.length}</strong></p>
+      <p>URL: <strong>{url}</strong> (len: {url.length})</p>
+      <p>KEY len: <strong>{key.length}</strong></p>
       <hr />
-      <p>ANON_KEY length: <strong>{key.length}</strong></p>
-      <p>ANON_KEY first 30: <strong>{key.slice(0, 30)}</strong></p>
-      <p>ANON_KEY last 30: <strong>{key.slice(-30)}</strong></p>
-      <p>Has newline: <strong>{String(hasNewline)}</strong></p>
-      <p>Has leading/trailing space: <strong>{String(hasSpace)}</strong></p>
-      <p>Has non-ASCII chars: <strong>{String(hasInvalidChars)}</strong></p>
+      <button onClick={testFetch} style={{ padding: "10px 20px", marginTop: 20 }}>
+        Test Supabase Connection
+      </button>
+      <pre style={{ marginTop: 20, whiteSpace: "pre-wrap" }}>{result}</pre>
     </div>
   );
 }
