@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import client from "@/lib/anthropic";
 import { buildSystemPrompt } from "@/lib/systemPrompt";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: NextRequest) {
   try {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json(
+        { error: "認証が必要です" },
+        { status: 401 }
+      );
+    }
+
     const { messages, conversationSummary } = await request.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {

@@ -3,7 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { ConversationMeta } from "@/lib/types";
-import { listConversations, deleteConversation } from "@/lib/localStorage";
+import {
+  listConversations,
+  deleteConversation,
+} from "@/lib/supabase/database";
 
 export default function HistoryList() {
   const [conversations, setConversations] = useState<ConversationMeta[]>([]);
@@ -11,15 +14,15 @@ export default function HistoryList() {
   const router = useRouter();
 
   useEffect(() => {
-    setConversations(listConversations());
+    listConversations().then(setConversations);
   }, []);
 
   const handleOpen = (id: string) => {
     router.push(`/chat?id=${id}`);
   };
 
-  const handleDelete = (id: string) => {
-    deleteConversation(id);
+  const handleDelete = async (id: string) => {
+    await deleteConversation(id);
     setConversations((prev) => prev.filter((c) => c.id !== id));
     setConfirmDeleteId(null);
   };

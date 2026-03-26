@@ -6,7 +6,7 @@ import { useChat } from "@/hooks/useChat";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
 import ThinkingAnimation from "./ThinkingAnimation";
-import { saveJournalEntry } from "@/lib/localStorage";
+import { saveJournalEntry } from "@/lib/supabase/database";
 
 const WELCOME_MESSAGE = {
   id: "welcome",

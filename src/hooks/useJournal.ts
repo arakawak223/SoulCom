@@ -5,7 +5,7 @@ import { JournalEntry } from "@/lib/types";
 import {
   loadJournalEntries,
   deleteJournalEntry as deleteEntry,
-} from "@/lib/localStorage";
+} from "@/lib/supabase/database";
 
 export function useJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
@@ -14,15 +14,15 @@ export function useJournal() {
   useEffect(() => {
     if (initialized.current) return;
     initialized.current = true;
-    setEntries(loadJournalEntries());
+    loadJournalEntries().then(setEntries);
   }, []);
 
   const refresh = useCallback(() => {
-    setEntries(loadJournalEntries());
+    loadJournalEntries().then(setEntries);
   }, []);
 
-  const deleteJournalEntry = useCallback((id: string) => {
-    deleteEntry(id);
+  const deleteJournalEntry = useCallback(async (id: string) => {
+    await deleteEntry(id);
     setEntries((prev) => prev.filter((e) => e.id !== id));
   }, []);
 

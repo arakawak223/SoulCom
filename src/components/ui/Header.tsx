@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -10,6 +11,7 @@ function generateId(): string {
 export default function Header() {
   const pathname = usePathname();
   const router = useRouter();
+  const { user, signOut } = useAuth();
 
   const handleNewChat = () => {
     const newId = generateId();
@@ -92,6 +94,14 @@ export default function Header() {
           >
             気づき
           </Link>
+          {user && (
+            <button
+              onClick={signOut}
+              className="text-sm text-[#e8e6e3]/40 hover:text-[#e8e6e3] transition-colors"
+            >
+              ログアウト
+            </button>
+          )}
         </nav>
       </div>
     </header>

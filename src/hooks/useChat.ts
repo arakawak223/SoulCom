@@ -2,7 +2,10 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Message } from "@/lib/types";
-import { saveConversation, loadConversation } from "@/lib/localStorage";
+import {
+  saveConversation,
+  loadConversation,
+} from "@/lib/supabase/database";
 
 const MINIMUM_THINKING_MS = 2500;
 
@@ -23,8 +26,11 @@ export function useChat(conversationId: string) {
     setError(null);
     setIsThinking(false);
     abortRef.current?.abort();
-    const saved = loadConversation(conversationId);
-    setMessages(saved && saved.length > 0 ? saved : []);
+    loadConversation(conversationId).then((saved) => {
+      if (currentIdRef.current === conversationId) {
+        setMessages(saved && saved.length > 0 ? saved : []);
+      }
+    });
   }, [conversationId]);
 
   // Save conversation whenever messages change
