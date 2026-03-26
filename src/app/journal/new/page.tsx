@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { saveJournalEntry } from "@/lib/supabase/database";
 
@@ -9,6 +9,14 @@ function generateId(): string {
 }
 
 export default function NewJournalPage() {
+  return (
+    <Suspense>
+      <NewJournalContent />
+    </Suspense>
+  );
+}
+
+function NewJournalContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const conversationId = searchParams.get("conversationId") ?? undefined;
