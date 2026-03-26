@@ -5,9 +5,11 @@ import { Message } from "@/lib/types";
 import {
   saveConversation,
   loadConversation,
+  saveJournalEntry,
 } from "@/lib/supabase/database";
 
 const MINIMUM_THINKING_MS = 2500;
+const INSIGHT_REGEX = /<!-- INSIGHT:\s*(.+?)\s*-->/;
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
@@ -118,6 +120,31 @@ export function useChat(conversationId: string) {
               };
             }
             return updated;
+          });
+        }
+
+        // Extract auto-detected insight and save to journal
+        const insightMatch = assistantContent.match(INSIGHT_REGEX);
+        if (insightMatch) {
+          const insightText = insightMatch[1];
+          const cleanContent = assistantContent.replace(INSIGHT_REGEX, "").trimEnd();
+
+          // Update message with insight tag removed
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            if (last.role === "assistant") {
+              updated[updated.length - 1] = { ...last, content: cleanContent };
+            }
+            return updated;
+          });
+
+          saveJournalEntry({
+            id: generateId(),
+            content: insightText,
+            sourceMessageId: assistantMessage.id,
+            conversationId: currentIdRef.current,
+            createdAt: Date.now(),
           });
         }
       } catch (err: unknown) {

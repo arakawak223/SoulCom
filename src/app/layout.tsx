@@ -13,7 +13,7 @@ const notoSansJP = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: "Soul Compass - ソウルコンパス",
   description:
-    "答えは、あなたの中にしかない。未来のあなたが、今のあなたを迎えに来る場所。",
+    "答えは、あなたの中にきっとある。未来のあなたが、今のあなたを迎えに来る場所",
 };
 
 export default function RootLayout({

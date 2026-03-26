@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { useChat } from "@/hooks/useChat";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
@@ -47,6 +47,7 @@ function ChatInner({ conversationId }: { conversationId: string }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
   const [savedMessageId, setSavedMessageId] = useState<string | null>(null);
+  const router = useRouter();
 
   const displayMessages =
     messages.length === 0 ? [WELCOME_MESSAGE] : messages;
@@ -115,6 +116,29 @@ function ChatInner({ conversationId }: { conversationId: string }) {
           <div ref={messagesEndRef} />
         </div>
       </div>
+      {messages.length > 0 && (
+        <div className="flex justify-center gap-3 px-4 pb-2">
+          <button
+            onClick={() => router.push(`/journal/new?conversationId=${conversationId}`)}
+            className="px-5 py-2 rounded-full text-xs tracking-wide
+              bg-[#c9a96e]/10 text-[#c9a96e]/70 border border-[#c9a96e]/20
+              hover:bg-[#c9a96e]/20 hover:text-[#c9a96e] transition-all duration-300"
+          >
+            気づきを入力する
+          </button>
+          <button
+            onClick={() => {
+              sessionStorage.removeItem("current-conversation");
+              router.push("/");
+            }}
+            className="px-5 py-2 rounded-full text-xs tracking-wide
+              bg-[#e8e6e3]/5 text-[#e8e6e3]/40 border border-[#e8e6e3]/10
+              hover:bg-[#e8e6e3]/10 hover:text-[#e8e6e3]/60 transition-all duration-300"
+          >
+            終了する
+          </button>
+        </div>
+      )}
       <ChatInput onSend={sendMessage} disabled={isThinking} />
     </div>
   );

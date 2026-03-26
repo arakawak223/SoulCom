@@ -26,7 +26,7 @@ export default function JournalCard({ entry, onDelete }: JournalCardProps) {
         <span className="text-[#e8e6e3]/30 text-xs">{dateStr}</span>
         <button
           onClick={() => onDelete(entry.id)}
-          className="opacity-0 group-hover:opacity-100 text-[#e8e6e3]/20 hover:text-red-400/60 transition-all duration-200 text-xs"
+          className="text-[#e8e6e3]/30 hover:text-red-400/60 transition-all duration-200 text-xs"
         >
           削除
         </button>

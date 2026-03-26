@@ -33,9 +33,9 @@ export default function Home() {
         </div>
 
         <p className="text-[#e8e6e3]/70 text-sm leading-relaxed max-w-sm mx-auto font-light">
-          答えは、あなたの中にしかない。
+          答えは、あなたの中にきっとある
           <br />
-          未来のあなたが、今のあなたを迎えに来る場所。
+          未来のあなたが、今のあなたを迎えに来る場所
         </p>
 
         <Link
