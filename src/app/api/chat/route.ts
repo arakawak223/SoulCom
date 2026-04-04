@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { messages, conversationSummary } = await request.json();
+    const { messages, conversationSummary, questionMode } = await request.json();
 
     if (!messages || !Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const systemPrompt = buildSystemPrompt(conversationSummary);
+    const systemPrompt = buildSystemPrompt(conversationSummary, questionMode ?? "single");
 
     const apiMessages = messages.map(
       (msg: { role: string; content: string }) => ({

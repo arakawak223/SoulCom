@@ -94,6 +94,16 @@ export default function Header() {
           >
             気づき
           </Link>
+          <Link
+            href="/settings"
+            className={`text-sm transition-colors ${
+              pathname === "/settings"
+                ? "text-[#c9a96e]"
+                : "text-[#e8e6e3]/60 hover:text-[#e8e6e3]"
+            }`}
+          >
+            設定
+          </Link>
           {user && (
             <button
               onClick={signOut}

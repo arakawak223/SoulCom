@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { Message } from "@/lib/types";
+import { Message, QuestionMode } from "@/lib/types";
 import {
   saveConversation,
   loadConversation,
@@ -15,7 +15,7 @@ function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
-export function useChat(conversationId: string) {
+export function useChat(conversationId: string, questionMode: QuestionMode = "single") {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isThinking, setIsThinking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,6 +70,7 @@ export function useChat(conversationId: string) {
               role: m.role,
               content: m.content,
             })),
+            questionMode,
           }),
           signal: abortRef.current.signal,
         });
@@ -157,7 +158,7 @@ export function useChat(conversationId: string) {
         );
       }
     },
-    [messages]
+    [messages, questionMode]
   );
 
   const clearConversation = useCallback(() => {

@@ -1,4 +1,6 @@
-export function buildSystemPrompt(conversationSummary?: string): string {
+import { QuestionMode } from "./types";
+
+export function buildSystemPrompt(conversationSummary?: string, questionMode: QuestionMode = "single"): string {
   const base = `あなたは「Soul Compass（ソウルコンパス）」——ユーザーの内側にある真実の答えを引き出すセルフ・コーチング・パートナーです。
 
 ## あなたの存在意義
@@ -71,13 +73,22 @@ export function buildSystemPrompt(conversationSummary?: string): string {
 ユーザーとの対話が始まるとき、温かく迎え入れます：
 「ようこそ、Soul Compassへ。ここはあなたの内側にある答えと出会うための場所です。今、あなたの心にあることを——どんなことでも、聴かせてください。」`;
 
+  const questionModeInstruction =
+    questionMode === "multiple"
+      ? `\n\n## 質問形式
+一度の応答で複数の問いかけをしてもかまいません（2〜3問まで）。異なる角度から問いを投げることで、ユーザーの内省を多面的に促してください。`
+      : `\n\n## 質問形式
+一度の応答では必ずひとつの問いかけだけを行ってください。ひとつの問いに集中することで、ユーザーが深く内省できる空間を守ります。`;
+
+  const full = base + questionModeInstruction;
+
   if (conversationSummary) {
-    return `${base}
+    return `${full}
 
 ## これまでの対話から
 ${conversationSummary}
 過去の文脈を自然に参照してもよいですが、無理に繋げないでください。`;
   }
 
-  return base;
+  return full;
 }

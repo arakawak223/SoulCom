@@ -45,6 +45,26 @@ create policy "Users can update own conversations"
 create policy "Users can delete own conversations"
   on conversations for delete using (auth.uid() = user_id);
 
+-- User settings table
+create table user_settings (
+  user_id uuid primary key references auth.users(id) on delete cascade,
+  question_mode text not null default 'single' check (question_mode in ('single', 'multiple')),
+  updated_at timestamptz not null default now()
+);
+
+-- Enable RLS
+alter table user_settings enable row level security;
+
+-- User settings RLS policies
+create policy "Users can view own settings"
+  on user_settings for select using (auth.uid() = user_id);
+
+create policy "Users can insert own settings"
+  on user_settings for insert with check (auth.uid() = user_id);
+
+create policy "Users can update own settings"
+  on user_settings for update using (auth.uid() = user_id);
+
 -- Journal entries RLS policies
 create policy "Users can view own journal entries"
   on journal_entries for select using (auth.uid() = user_id);

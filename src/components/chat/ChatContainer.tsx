@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useChat } from "@/hooks/useChat";
+import { useSettings } from "@/hooks/useSettings";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
 import ThinkingAnimation from "./ThinkingAnimation";
@@ -42,7 +43,8 @@ export default function ChatContainer() {
 }
 
 function ChatInner({ conversationId }: { conversationId: string }) {
-  const { messages, isThinking, error, sendMessage } = useChat(conversationId);
+  const { settings } = useSettings();
+  const { messages, isThinking, error, sendMessage } = useChat(conversationId, settings.questionMode);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);

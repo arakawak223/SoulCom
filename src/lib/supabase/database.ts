@@ -1,5 +1,5 @@
 import { createClient } from "./client";
-import { Message, ConversationMeta, JournalEntry } from "../types";
+import { Message, ConversationMeta, JournalEntry, UserSettings, QuestionMode } from "../types";
 
 export async function saveConversation(
   id: string,
@@ -107,4 +107,36 @@ export async function loadJournalEntries(): Promise<JournalEntry[]> {
 export async function deleteJournalEntry(id: string): Promise<void> {
   const supabase = createClient();
   await supabase.from("journal_entries").delete().eq("id", id);
+}
+
+export async function loadUserSettings(): Promise<UserSettings> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { questionMode: "single" };
+
+  const { data } = await supabase
+    .from("user_settings")
+    .select("question_mode")
+    .eq("user_id", user.id)
+    .single();
+
+  return {
+    questionMode: (data?.question_mode as QuestionMode) ?? "single",
+  };
+}
+
+export async function saveUserSettings(settings: UserSettings): Promise<void> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  await supabase.from("user_settings").upsert({
+    user_id: user.id,
+    question_mode: settings.questionMode,
+    updated_at: new Date().toISOString(),
+  });
 }

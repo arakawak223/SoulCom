@@ -26,3 +26,9 @@ export interface JournalEntry {
   conversationId?: string;
   createdAt: number;
 }
+
+export type QuestionMode = "single" | "multiple";
+
+export interface UserSettings {
+  questionMode: QuestionMode;
+}
