@@ -4,17 +4,27 @@ import { useEffect, useRef, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useChat } from "@/hooks/useChat";
 import { useSettings } from "@/hooks/useSettings";
+import { ChatMode } from "@/lib/types";
 import MessageBubble from "./MessageBubble";
 import ChatInput from "./ChatInput";
 import ThinkingAnimation from "./ThinkingAnimation";
 import { saveJournalEntry } from "@/lib/supabase/database";
 
-const WELCOME_MESSAGE = {
-  id: "welcome",
-  role: "assistant" as const,
-  content:
-    "ようこそ、Soul Compassへ。\nここはあなたの内側にある答えと出会うための場所です。\n\n今、あなたの心にあることを——どんなことでも、聴かせてください。",
-  timestamp: 0,
+const WELCOME_MESSAGES: Record<ChatMode, { id: string; role: "assistant"; content: string; timestamp: number }> = {
+  compass: {
+    id: "welcome",
+    role: "assistant",
+    content:
+      "ようこそ、Soul Compassへ。\nここはあなたの内側にある答えと出会うための場所です。\n\n今、あなたの心にあることを——どんなことでも、聴かせてください。",
+    timestamp: 0,
+  },
+  saisei: {
+    id: "welcome",
+    role: "assistant",
+    content:
+      "ようこそ、人間再生塾へ。\nここはあなたの魂が再び輝き出すための場所です。\n\nどんな重荷も、ここに置いていってください。俺が一緒に持ちますから。\n——今日は、何を話しましょうか？",
+    timestamp: 0,
+  },
 };
 
 function generateId(): string {
@@ -24,14 +34,18 @@ function generateId(): string {
 export default function ChatContainer() {
   const searchParams = useSearchParams();
   const [conversationId, setConversationId] = useState<string>("");
+  const [chatMode, setChatMode] = useState<ChatMode>("compass");
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     const paramId = searchParams.get("id");
-    const storedId = sessionStorage.getItem("current-conversation");
+    const mode = (searchParams.get("mode") as ChatMode) || "compass";
+    const storageKey = `current-conversation-${mode}`;
+    const storedId = sessionStorage.getItem(storageKey);
     const id = paramId || storedId || generateId();
-    sessionStorage.setItem("current-conversation", id);
+    sessionStorage.setItem(storageKey, id);
     setConversationId(id);
+    setChatMode(mode);
     setReady(true);
   }, [searchParams]);
 
@@ -39,12 +53,12 @@ export default function ChatContainer() {
     return null;
   }
 
-  return <ChatInner conversationId={conversationId} />;
+  return <ChatInner conversationId={conversationId} chatMode={chatMode} />;
 }
 
-function ChatInner({ conversationId }: { conversationId: string }) {
+function ChatInner({ conversationId, chatMode }: { conversationId: string; chatMode: ChatMode }) {
   const { settings } = useSettings();
-  const { messages, isThinking, error, sendMessage } = useChat(conversationId, settings.questionMode);
+  const { messages, isThinking, error, sendMessage } = useChat(conversationId, settings.questionMode, chatMode);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
@@ -52,7 +66,7 @@ function ChatInner({ conversationId }: { conversationId: string }) {
   const router = useRouter();
 
   const displayMessages =
-    messages.length === 0 ? [WELCOME_MESSAGE] : messages;
+    messages.length === 0 ? [WELCOME_MESSAGES[chatMode]] : messages;
 
   // Auto-scroll
   useEffect(() => {

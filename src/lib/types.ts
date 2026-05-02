@@ -29,6 +29,8 @@ export interface JournalEntry {
 
 export type QuestionMode = "single" | "multiple";
 
+export type ChatMode = "compass" | "saisei";
+
 export interface UserSettings {
   questionMode: QuestionMode;
 }
